@@ -1,0 +1,108 @@
+import math
+
+class Category:
+
+  def __init__(self, name="budget"):
+        self.name = name
+        self.ledger = []
+
+  def check_funds(self, amount):
+    funds = sum(item['amount'] for item in self.ledger)
+    if funds < amount:
+      return False
+    return True
+
+  def deposit(self, amount, description = ""):
+    self.ledger.append({"amount": amount, "description": description})
+
+  def withdraw(self, amount, description = ""):  
+    if self.check_funds(amount):
+      self.ledger.append({"amount": -amount, "description": description})
+      return True
+    return False
+
+  def get_balance(self):
+    funds = sum(item['amount'] for item in self.ledger)
+    return funds
+
+  def transfer(self, amount, category):
+    if self.check_funds(amount):
+      self.withdraw(amount, "Transfer to " + category.name)
+      category.deposit(amount, "Transfer from " + self.name)
+      return True
+    return False
+
+  def __str__(self):
+    output = ""
+    
+    asteriskNumber = (30 - len(self.name)) // 2
+    for i in range(asteriskNumber):
+      output += "*"
+    output += self.name
+    for i in range(asteriskNumber):
+      output += "*"
+    output += "\n"
+
+    for item in self.ledger:
+      output += item["description"][0:23]
+      descLen = len(item["description"][0:23])
+      amount = "{:.2f}".format(item["amount"])
+      amountLen = len(amount)
+      
+      spaceNumber = 30 - amountLen - descLen
+      for i in range(spaceNumber):
+        output += " "
+      output += amount
+      output += "\n"
+
+    output += "Total: " + "{:.2f}".format(self.get_balance())
+    return output
+    
+def create_spend_chart(categories):
+  output = "Percentage spent by category\n"
+  
+  withdrawals = []
+  names = []
+  for category in categories:
+    withdrawal = 0
+    for item in category.ledger:
+      if item["amount"] < 0:
+        withdrawal += item["amount"]
+    withdrawals.append(withdrawal)
+    names.append(category.name)
+    
+  withdrawalSum = sum(withdrawals)
+  percentages = []
+  for amount in withdrawals:
+    percentages.append(int( math.floor( (amount/withdrawalSum*100) / 10) * 10 ))
+
+  for i in range(100, -10, -10):
+    if i < 10:
+      output += "  "
+    elif i < 100:
+      output += " "
+      
+    output += str(i) + "| "
+    for percentage in percentages:
+      if percentage >= i:
+        output += "o  "
+      else:
+        output += "   "
+    output += "\n"
+
+  numberOfDashes = len(percentages) * 3 + 1
+  
+  output += " " * 4 + "-" * numberOfDashes + "\n"
+
+  maxStringLen = max(names, key=len)
+  for i in range(len(maxStringLen)):
+    output += "     "
+    for name in names:
+      if i < len(name):
+        output += name[i] + "  "
+      else:
+        output += "   "
+    if i != len(maxStringLen)-1:
+      output += "\n"
+
+  return output;

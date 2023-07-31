@@ -1,0 +1,59 @@
+import re
+
+def arithmetic_arranger(problems, showAnswer = False):
+  topRow = ""
+  lineRow = ""
+  bottomRow = ""
+  answerRow = ""
+  
+  if len(problems) > 5:
+    return "Error: Too many problems."
+
+  iteration = 0
+  for expression in problems:
+    splitExpression = expression.split()
+    top = splitExpression[0]
+    operand = splitExpression[1]
+    bottom = splitExpression[2]
+
+    if operand != "+" and operand != "-":
+      return "Error: Operator must be '+' or '-'."
+    if re.search("\D", top) or re.search("\D", bottom):
+      return "Error: Numbers must only contain digits."
+    if len(top) > 4 or len(bottom) > 4:
+      return "Error: Numbers cannot be more than four digits."
+
+    width = int(max(len(top), len(bottom))) + 2
+
+    for i in range(width-len(top)):
+      topRow += " "
+    topRow += top
+
+    bottomRow += operand
+    for i in range(width-1-len(bottom)):
+      bottomRow += " "
+    bottomRow += bottom
+    
+    for i in range(width):
+      lineRow += "-"
+
+    answer = str(eval(expression))
+    for i in range(width-len(answer)):
+      answerRow += " "
+    answerRow += answer
+
+    if iteration != len(problems)-1:
+      topRow += "    "
+      lineRow += "    "
+      bottomRow += "    "
+      answerRow += "    "
+    iteration += 1
+    
+  topRow += "\n"
+  bottomRow += "\n"
+
+  arranged_problems = topRow + bottomRow + lineRow
+  if showAnswer == True:
+    arranged_problems += "\n"
+    arranged_problems += answerRow
+  return arranged_problems

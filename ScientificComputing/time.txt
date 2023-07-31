@@ -1,0 +1,67 @@
+def add_time(start, duration, day = None):
+  periods = {
+    "AM": "PM",
+    "PM": "AM"
+  }
+  numberToDay = {
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Saturday",
+    0: "Sunday"
+  }
+  dayToNumber = {
+    "monday": 1,
+    "tuesday": 2,
+    "wednesday": 3,
+    "thursday": 4,
+    "friday": 5,
+    "saturday": 6,
+    "sunday": 0
+}
+
+  splittedStart = start.split()
+  startTime = splittedStart[0].split(":")
+  durTime = duration.split(":")
+
+  period = splittedStart[1]
+  startHours = startTime[0]
+  startMinutes = startTime[1]
+  durHours = durTime[0]
+  durMinutes = durTime[1]
+
+  totalHours = int(startHours) + (int(startMinutes) / 60) + int(durHours) + (int(durMinutes) / 60)
+  
+  newTimeArr = str(totalHours % 12 ).split(".")
+  
+  newHours = newTimeArr[0]
+  if newHours == "0":
+    newHours = "12"
+    
+  newMinutes = round(float("0." + newTimeArr[1]) * 60)
+  if newMinutes < 10:
+    newMinutes = "0" + str(newMinutes)
+
+  newPeriod = period
+  if round((totalHours / 12) % 2):
+    newPeriod = periods[period]
+
+  if period == "PM":
+    totalHours += 12
+  daysLater = (totalHours / 24)
+
+  if day != None:
+    dayNumber = dayToNumber[day.lower()]
+    newDayNumber = ((daysLater + dayNumber) % 7) // 1
+    newDay = numberToDay[newDayNumber]
+  
+  if daysLater < 1:
+    new_time = newHours + ":" + str(newMinutes) + " " + newPeriod + (", " + newDay if day != None else "")
+  elif daysLater > 1 and daysLater < 2:
+    new_time = newHours + ":" + str(newMinutes) + " " + newPeriod + (", " + newDay if day != None else "") + " (next day)"
+  else:
+    new_time = newHours + ":" + str(newMinutes) + " " + newPeriod  + (", " + newDay if day != None else "") + " (" + str(round(daysLater)) + " days later)"
+    
+  return new_time
